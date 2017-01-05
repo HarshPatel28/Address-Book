@@ -12,6 +12,7 @@ public class Contact {
 	public String address;
 	Contact left;
 	Contact right;
+	Contact parent;
 	int height;
 	
 	public Contact(String name, long number, String email, String address) {
@@ -21,6 +22,7 @@ public class Contact {
 		this.address = address;
 		this.left = null;
 		this.right = null;
+		this.parent = null;
 		this.height = 0;
 	}
 	

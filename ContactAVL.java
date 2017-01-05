@@ -20,13 +20,14 @@ public class ContactAVL {
 	}
 	
 	public void addContact(String name, long number, String email, String address)
-	throws IllegalArgumentException {	// throw argument if same name AND number
+	throws IllegalArgumentException {	// throw argument if same name AND number!!!!!
 		Contact ptr = root, prev = null;
 		Contact newContact = new Contact(name, number, email, address);
 		if(ptr == null) {	// AddressBook is empty
 			root = newContact;
 			sizeOfAB++;
 			updateHeight();
+			updateParent();
 			return;
 		}
 		int equals = 0;
@@ -41,6 +42,7 @@ public class ContactAVL {
 					newContact.right = temp;
 					sizeOfAB++;
 					updateHeight();
+					updateParent();
 					return;
 				}
 			} else {
@@ -55,6 +57,7 @@ public class ContactAVL {
 			prev.left = newContact;
 		}
 		updateHeight();
+		updateParent();
 		sizeOfAB++;
 	}
 	
@@ -62,7 +65,7 @@ public class ContactAVL {
 		
 	}
 	
-	public void deleteContact(String name, long number)
+	public void deleteContact(String name, long number)// what if duplicate name but different number?????
 	throws NoSuchElementException {
 		
 	}
@@ -71,16 +74,57 @@ public class ContactAVL {
 		if(root == null) {
 			return;
 		}
-		recursiveUpdateHeight(root);
+	
+		if(recursiveUpdateHeight(root) == -1) {
+			updateHeight();
+		}
 	}
 	
-	private int recursiveUpdateHeight(Contact root) {
-		if(root == null) {
+	private int recursiveUpdateHeight(Contact rootNode) {
+		if(rootNode == null) {
 			return -1;
 		}
-		root.height = 1 + recursiveUpdateHeight(root.left);
-		root.height = Math.max(root.height, (1 + recursiveUpdateHeight(root.right)));
-		return root.height;
+		rootNode.height = 1 + recursiveUpdateHeight(rootNode.left);
+		rootNode.height = Math.max(rootNode.height, (1 + recursiveUpdateHeight(rootNode.right)));
+		
+		
+		
+		if(isBalanced(rootNode)) {
+			return -1;
+		}
+		return rootNode.height;
+	}
+	
+	public boolean isBalanced(Contact rootNode) {
+		int a = 0;
+		int b = 0;
+		if(rootNode.left == null) {
+			a = 0;
+		} else {
+			a = rootNode.height;
+		}
+		if(rootNode.right == null) {
+			b = 0;
+		} else {
+			b = rootNode.height;
+		}
+		if((a-b) == -2) {	// right is unbalanced
+			if(rootNode.right.right == null) {
+				
+			} else {
+				
+			}
+			return true;
+		} else if ((a-b) == 2) {	// left is unbalanced
+			if(rootNode.left.left == null) {
+				
+			} else {
+				
+			}
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public void printContacts() {
@@ -96,13 +140,34 @@ public class ContactAVL {
 			return;
 		}
 		recursivePrintContacts(rootNode.left);
+		
 		System.out.println(rootNode.name + "\t" + rootNode.number + "\t" + 
 				rootNode.email + "\t" + rootNode.address);
-		recursivePrintContacts(rootNode.right);
 		
+		recursivePrintContacts(rootNode.right);
 	}
 	
-	public boolean contains(String name) {
+	public void updateParent() { 	
+		recursiveUpdateParent(root);
+	}
+	
+	private Contact recursiveUpdateParent(Contact rootNode) {
+		if(rootNode == null) {
+			return null;
+		}
+		if(rootNode.left != null) {
+			rootNode.left.parent = rootNode;
+		}
+		if(rootNode.right != null) {
+			rootNode.right.parent = rootNode;
+		}
+		recursiveUpdateParent(rootNode.left);
+		recursiveUpdateParent(rootNode.right);
+		// should this return this?????
+		return null;
+	}
+	
+	public boolean contains(String name) {	// what if user wants to search using number????
 		Contact checker = root;
 		int equals = 0;
 		while(checker != null) {
@@ -113,6 +178,6 @@ public class ContactAVL {
 			checker = equals > 0 ? checker.right : checker.left;
 		}
 		return false;
-	}	
+	}	// this method might be called by update method
 	
 }
