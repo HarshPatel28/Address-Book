@@ -27,6 +27,7 @@ public class ContactAVL {
 			root = newContact;
 			sizeOfAB++;
 			updateHeight();
+			rebalance(root);
 			updateParent();
 			return;
 		}
@@ -42,6 +43,7 @@ public class ContactAVL {
 					newContact.right = temp;
 					sizeOfAB++;
 					updateHeight();
+					rebalance(root);
 					updateParent();
 					return;
 				}
@@ -57,6 +59,7 @@ public class ContactAVL {
 			prev.left = newContact;
 		}
 		updateHeight();
+		rebalance(root);
 		updateParent();
 		sizeOfAB++;
 	}
@@ -86,19 +89,117 @@ public class ContactAVL {
 	}
 	
 	private void rotateRR(Contact rootNode) {
+		boolean rootIsMainRoot;
+		Contact tempParent = null;
+		boolean isRight = false;
+		if(rootNode == root) {
+			rootIsMainRoot = true;
+		} else {
+			tempParent = rootNode.parent;
+			if(tempParent.right == rootNode) {
+				isRight = true;
+			} else {
+				isRight = false;
+			}
+			rootIsMainRoot = false;
+		}
 		
+		Contact child = rootNode.right;
+		Contact temp = child.left;
+		
+		rootNode.right = temp;
+		temp.parent = rootNode;
+		child.left = rootNode;
+		rootNode.parent = child;
+		
+		if(rootIsMainRoot) {
+			root = child;
+			child.parent = null;
+		} else {
+			child.parent = tempParent;
+			if(isRight) {
+				tempParent.right = child;
+			} else {
+				tempParent.left = child;
+			}
+		}
+		
+		updateHeight();
 	}
 	
 	private void rotateRL(Contact rootNode) {
+		Contact child = rootNode.right;
+		Contact gChild = child.left;
+		Contact temp = gChild.right;
 		
+		gChild.right = child;
+		child.parent = gChild;
+		child.left = temp;
+		if(temp != null) {
+			temp.parent = child;
+		}
+		rootNode.right = gChild;
+		gChild.parent = rootNode;
+		
+		// Afterwards, it'll be a RR case.
+		rotateRR(rootNode);
 	}
 	
 	private void rotateLL(Contact rootNode) {
+		boolean rootIsMainRoot;
+		Contact tempParent = null;
+		boolean isLeft = false;
+		if(rootNode == root) {
+			rootIsMainRoot = true;
+		} else {
+			tempParent = rootNode.parent;
+			if(tempParent.left == rootNode) {
+				isLeft = true;
+			} else {
+				isLeft = false;
+			}
+			rootIsMainRoot = false;
+		}
 		
+		Contact child = rootNode.left;
+		Contact temp = child.right;
+		
+		rootNode.left = temp;
+		temp.parent = rootNode;
+		child.right = rootNode;
+		rootNode.parent = child;
+		
+		if(rootIsMainRoot) {
+			root = child;
+			child.parent = null;
+		} else {
+			child.parent = tempParent;
+			if(isLeft) {
+				tempParent.left = child;
+			} else {
+				tempParent.right = child;
+			}
+		}
+		
+		updateHeight();
 	}
 	
 	private void rotateLR(Contact rootNode) {
+		Contact child = rootNode.left;
+		Contact gChild = child.right;
+		Contact temp = gChild.left;
 		
+		gChild.left = child;
+		child.parent = gChild;
+		child.right = temp;
+		if(temp != null) {
+			temp.parent = child;
+		}
+		rootNode.left = gChild;
+		gChild.parent = rootNode;
+		
+		// Afterwards, it'll be a LL case.
+		rotateLL(rootNode);
 	}
 	
 	public void deleteContact(String name, long number)// what if duplicate name but different number?????
