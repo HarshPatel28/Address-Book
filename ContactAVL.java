@@ -61,7 +61,43 @@ public class ContactAVL {
 		sizeOfAB++;
 	}
 	
-	public void sortContacts() {
+	public void sortContacts(Contact rootNode, String unbalanced) {
+		if(unbalanced.equals("right")) {
+			if(rootNode.right.right == null) {
+				rotateRL(rootNode);
+			} else if (rootNode.right.left == null) {
+				rotateRR(rootNode);
+			} else if (rootNode.right.left.height > rootNode.right.right.height) {
+				rotateRL(rootNode);
+			} else if (rootNode.right.right.height > rootNode.right.left.height) {
+				rotateRR(rootNode);
+			}
+		} else if (unbalanced.equals("left")) {
+			if(rootNode.left.left == null) {
+				rotateLR(rootNode);
+			} else if (rootNode.left.right == null) {
+				rotateLL(rootNode);
+			} else if (rootNode.left.right.height > rootNode.left.left.height) {
+				rotateLR(rootNode);
+			} else if (rootNode.left.left.height > rootNode.left.right.height) {
+				rotateLL(rootNode);
+			}
+		}
+	}
+	
+	private void rotateRR(Contact rootNode) {
+		
+	}
+	
+	private void rotateRL(Contact rootNode) {
+		
+	}
+	
+	private void rotateLL(Contact rootNode) {
+		
+	}
+	
+	private void rotateLR(Contact rootNode) {
 		
 	}
 	
@@ -75,9 +111,7 @@ public class ContactAVL {
 			return;
 		}
 	
-		if(recursiveUpdateHeight(root) == -1) {
-			updateHeight();
-		}
+		recursiveUpdateHeight(root);
 	}
 	
 	private int recursiveUpdateHeight(Contact rootNode) {
@@ -87,44 +121,44 @@ public class ContactAVL {
 		rootNode.height = 1 + recursiveUpdateHeight(rootNode.left);
 		rootNode.height = Math.max(rootNode.height, (1 + recursiveUpdateHeight(rootNode.right)));
 		
-		
-		
-		if(isBalanced(rootNode)) {
-			return -1;
-		}
 		return rootNode.height;
 	}
 	
-	public boolean isBalanced(Contact rootNode) {
-		int a = 0;
-		int b = 0;
-		if(rootNode.left == null) {
-			a = 0;
-		} else {
-			a = rootNode.height;
+	public int rebalance(Contact rootNode) {
+		if(rootNode == null) {
+			return -1;
 		}
-		if(rootNode.right == null) {
-			b = 0;
+		
+		rebalance(rootNode.left);
+		rebalance(rootNode.right);
+		int a, b;
+		if(rootNode.left == null && rootNode.height < 2) {
+			return -1;
+		} else if (rootNode.right == null && rootNode.height < 2) {
+			return -1;
 		} else {
-			b = rootNode.height;
-		}
-		if((a-b) == -2) {	// right is unbalanced
-			if(rootNode.right.right == null) {
-				
+			if(rootNode.left == null) {
+				a = 0;
 			} else {
-				
+				a = rootNode.left.height + 1;
 			}
-			return true;
-		} else if ((a-b) == 2) {	// left is unbalanced
-			if(rootNode.left.left == null) {
-				
+			if(rootNode.right == null) {
+				b = 0;
 			} else {
-				
+				b = rootNode.right.height + 1;
 			}
-			return true;
-		} else {
-			return false;
+			if((a-b) != -2 && (a-b) != 2) {
+				return -1;
+			} else if ((a-b) == -2) {
+				// right is unbalanced
+				sortContacts(rootNode, "right");
+			} else if ((a-b) == 2) {
+				// left is unbalanced
+				sortContacts(rootNode, "left");
+			}
 		}
+		
+		return -1;
 	}
 	
 	public void printContacts() {
