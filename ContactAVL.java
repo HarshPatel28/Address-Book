@@ -202,9 +202,93 @@ public class ContactAVL {
 		rotateLL(rootNode);
 	}
 	
-	public void deleteContact(String name, long number)// what if duplicate name but different number?????
+	public void deleteContact(String name)// what if duplicate name but different number?????
 	throws NoSuchElementException {
 		
+		if(!contains(name)) {
+			throw new NoSuchElementException("This contact does not exist.");
+		}
+		
+		if(containsMultiple(name)) {
+			// SEND TO A SPECIAL DELETION CASE.
+		}
+		
+		Contact ptr = root, prev = null;
+		int equals = 0;
+		
+		while(ptr != null) {
+			equals = name.compareToIgnoreCase(ptr.name);
+			if(equals == 0) {
+				break;	// contact is found
+			}
+			prev = ptr;
+			ptr = equals > 0 ? ptr.right : ptr.left;
+		}
+		
+		if(ptr.right != null && ptr.left != null) {
+			Contact replacement = ptr.left;
+			prev = ptr;
+			while(replacement.right != null) {
+				prev = replacement;
+				replacement = replacement.right;
+			}
+			ptr.name = replacement.name;
+			ptr.number = replacement.number;
+			ptr.email = replacement.email;
+			ptr.address = replacement.address;
+			ptr = replacement;
+		}
+		
+		if(ptr.left == null && ptr.right == null) {
+			if(ptr == root) {
+				root = null;
+				sizeOfAB--;
+				
+				return;
+			}
+			if(prev.left == ptr) {
+				prev.left = null;
+			} else {
+				prev.right = null;
+			}
+			
+			sizeOfAB--;
+			
+			return;
+		}
+		
+		if(ptr.left == null && ptr.right != null) {
+			if(ptr == root) {
+				root = ptr.right;
+				sizeOfAB--;
+				
+				return;
+			}
+			if(prev.left == ptr) {
+				prev.left = ptr.right;
+			} else {
+				prev.right = ptr.right;
+			}
+			sizeOfAB--;
+			
+			return;
+		} 
+		if(ptr.right == null && ptr.left != null) {
+			if(ptr == root) {
+				root = ptr.left;
+				sizeOfAB--;
+				
+				return;
+			}
+			if(prev.left == ptr) {
+				prev.left = ptr.left;
+			} else {
+				prev.right = ptr.left;
+			}
+			sizeOfAB--;
+			
+			return;
+		}
 	}
 	
 	public void updateHeight() {
@@ -298,7 +382,6 @@ public class ContactAVL {
 		}
 		recursiveUpdateParent(rootNode.left);
 		recursiveUpdateParent(rootNode.right);
-		// should this return this?????
 		return null;
 	}
 	
@@ -313,6 +396,29 @@ public class ContactAVL {
 			checker = equals > 0 ? checker.right : checker.left;
 		}
 		return false;
-	}	// this method might be called by update method
+	}
+	
+	public boolean containsMultiple(String name) {
+		Contact checker = root;
+		int equals = 0;
+		while(checker != null) {
+			equals = name.compareToIgnoreCase(checker.name);
+			if(equals == 0) {
+				if(checker.left != null) {
+					if(checker.left.name.compareToIgnoreCase(name) == 0) {
+						return true;
+					}
+				}
+				if(checker.right != null) {
+					if(checker.right.name.compareToIgnoreCase(name) == 0) {
+						return true;
+					}
+				}
+				return false;
+			}
+			checker = equals > 0 ? checker.right : checker.left;
+		}
+		return false;
+	}
 	
 }
