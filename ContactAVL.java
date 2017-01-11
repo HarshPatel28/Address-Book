@@ -108,7 +108,9 @@ public class ContactAVL {
 		Contact temp = child.left;
 		
 		rootNode.right = temp;
-		temp.parent = rootNode;
+		if(temp != null) {
+			temp.parent = rootNode;
+		}
 		child.left = rootNode;
 		rootNode.parent = child;
 		
@@ -165,7 +167,9 @@ public class ContactAVL {
 		Contact temp = child.right;
 		
 		rootNode.left = temp;
-		temp.parent = rootNode;
+		if(temp != null) {
+			temp.parent = rootNode;
+		}
 		child.right = rootNode;
 		rootNode.parent = child;
 		
@@ -208,10 +212,11 @@ public class ContactAVL {
 		if(!contains(name)) {
 			throw new NoSuchElementException("This contact does not exist.");
 		}
-		
-		if(containsMultiple(name)) {
-			// SEND TO A SPECIAL DELETION CASE.
-		}
+		/*
+			if(containsMultiple(name)) {
+				// SEND TO A SPECIAL DELETION CASE.
+			}
+		*/
 		
 		Contact ptr = root, prev = null;
 		int equals = 0;
@@ -243,7 +248,9 @@ public class ContactAVL {
 			if(ptr == root) {
 				root = null;
 				sizeOfAB--;
-				
+				updateHeight();
+				rebalance(root); 
+				updateParent();
 				return;
 			}
 			if(prev.left == ptr) {
@@ -253,7 +260,9 @@ public class ContactAVL {
 			}
 			
 			sizeOfAB--;
-			
+			updateHeight(); 
+			rebalance(root); 
+			updateParent();
 			return;
 		}
 		
@@ -261,7 +270,9 @@ public class ContactAVL {
 			if(ptr == root) {
 				root = ptr.right;
 				sizeOfAB--;
-				
+				updateHeight(); 
+				rebalance(root); 
+				updateParent();
 				return;
 			}
 			if(prev.left == ptr) {
@@ -270,14 +281,18 @@ public class ContactAVL {
 				prev.right = ptr.right;
 			}
 			sizeOfAB--;
-			
+			updateHeight(); 
+			rebalance(root); 
+			updateParent();
 			return;
 		} 
 		if(ptr.right == null && ptr.left != null) {
 			if(ptr == root) {
 				root = ptr.left;
 				sizeOfAB--;
-				
+				updateHeight(); 
+				rebalance(root); 
+				updateParent();
 				return;
 			}
 			if(prev.left == ptr) {
@@ -286,8 +301,101 @@ public class ContactAVL {
 				prev.right = ptr.left;
 			}
 			sizeOfAB--;
-			
+			updateHeight(); 
+			rebalance(root);
+			updateParent();
 			return;
+		}
+	}
+	
+	public void specialDeletionCase(Contact rootNode, String name, long number) {
+		if(rootNode == null) {
+			return;
+		}
+		
+		specialDeletionCase(rootNode.left, name, number);
+		specialDeletionCase(rootNode.right, name, number);
+		if(rootNode.name.equalsIgnoreCase(name) && rootNode.number == number) {
+			
+			if(rootNode.right != null && rootNode.left != null) {
+				Contact replacement = rootNode.left;
+				Contact prev = rootNode;
+				while(replacement.right != null) {
+					prev = replacement;
+					replacement = replacement.right;
+				}
+				rootNode.name = replacement.name;
+				rootNode.number = replacement.number;
+				rootNode.email = replacement.email;
+				rootNode.address = replacement.address;
+				rootNode = replacement;
+			}
+			
+			Contact prev = rootNode.parent;
+			
+			if(rootNode.left == null && rootNode.right == null) {
+				if(rootNode == root) {
+					root = null;
+					sizeOfAB--;
+					updateHeight(); 
+					rebalance(root); 
+					updateParent();
+					return;
+				}
+				if(prev.left == rootNode) {
+					prev.left = null;
+				} else {
+					prev.right = null;
+				}
+				
+				sizeOfAB--;
+				updateHeight(); 
+				rebalance(root); 
+				updateParent();
+				return;
+			}
+			
+			if(rootNode.left == null && rootNode.right != null) {
+				if(rootNode == root) {
+					root = rootNode.right;
+					sizeOfAB--;
+					updateHeight(); 
+					rebalance(root); 
+					updateParent();
+					return;
+				}
+				if(prev.left == rootNode) {
+					prev.left = rootNode.right;
+				} else {
+					prev.right = rootNode.right;
+				}
+				sizeOfAB--;
+				updateHeight(); 
+				rebalance(root); 
+				updateParent();
+				return;
+			} 
+			if(rootNode.right == null && rootNode.left != null) {
+				if(rootNode == root) {
+					root = rootNode.left;
+					sizeOfAB--;
+					updateHeight(); 
+					rebalance(root); 
+					updateParent();
+					return;
+				}
+				if(prev.left == rootNode) {
+					prev.left = rootNode.left;
+				} else {
+					prev.right = rootNode.left;
+				}
+				sizeOfAB--;
+				updateHeight(); 
+				rebalance(root); 
+				updateParent();
+				return;
+			}
+			
 		}
 	}
 	
@@ -399,26 +507,25 @@ public class ContactAVL {
 	}
 	
 	public boolean containsMultiple(String name) {
-		Contact checker = root;
-		int equals = 0;
-		while(checker != null) {
-			equals = name.compareToIgnoreCase(checker.name);
-			if(equals == 0) {
-				if(checker.left != null) {
-					if(checker.left.name.compareToIgnoreCase(name) == 0) {
-						return true;
-					}
-				}
-				if(checker.right != null) {
-					if(checker.right.name.compareToIgnoreCase(name) == 0) {
-						return true;
-					}
-				}
-				return false;
-			}
-			checker = equals > 0 ? checker.right : checker.left;
+		if(recursiveContainsMultiple(root, name) > 1) {
+			return true;
 		}
 		return false;
+	}
+	
+	private int recursiveContainsMultiple(Contact rootNode, String name) {
+		if(rootNode == null) {
+			return 0;
+		} 
+			
+		int left = recursiveContainsMultiple(rootNode.left, name);
+		int right = recursiveContainsMultiple(rootNode.right, name);
+		
+		int counter = left + right;
+		if(rootNode.name.equalsIgnoreCase(name)) {
+			counter++;
+		}
+		return counter;
 	}
 	
 }
