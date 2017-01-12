@@ -493,6 +493,20 @@ public class ContactAVL {
 		return null;
 	}
 	
+	public void search(Contact rootNode, String name) {
+		if(rootNode == null) {
+			return;
+		}
+		name = name.toLowerCase();
+		
+		search(rootNode.left, name);
+		if(rootNode.name.toLowerCase().contains(name)) {
+			System.out.println(rootNode.name + "\t" + rootNode.number + "\t" + 
+					rootNode.email + "\t" + rootNode.address);
+		}
+		search(rootNode.right, name);
+	}
+	
 	public boolean contains(String name) {	// what if user wants to search using number????
 		Contact checker = root;
 		int equals = 0;
@@ -526,6 +540,14 @@ public class ContactAVL {
 			counter++;
 		}
 		return counter;
+	}
+	
+	public boolean isEmpty() {
+		if(root == null) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 }
