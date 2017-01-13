@@ -26,9 +26,8 @@ public class ContactAVL {
 		if(ptr == null) {	// AddressBook is empty
 			root = newContact;
 			sizeOfAB++;
-			updateHeight();
-			rebalance(root);
-			updateParent();
+			root.height = 0;
+			root.parent = null;
 			return;
 		}
 		int equals = 0;

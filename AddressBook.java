@@ -1,17 +1,19 @@
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigInteger;
 
 public class AddressBook {
-	
-	
+
 	/*
 	 * Main driver class that asks the user for what actions to perform, 
 	 * such as adding, deleting, searching, and printing all contacts.
 	 * 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-		
-		Scanner scanner = new Scanner(System.in);
+
+		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 		ContactAVL AB = new ContactAVL();
 		
 		String[] operations = {"add", "delete", "print", "search", "check", "size"};
@@ -24,19 +26,20 @@ public class AddressBook {
 				+ "what operation you want to perform!\n"
 				+ "To exit the program, simply write 'EXIT'.\n");
 		
-		String response = "";
-		do {
+		while(true) {
+			String response = "";
 			System.out.print("What operation do you want to perform? ");
-			response = scanner.next().toLowerCase();
-			if(response.equalsIgnoreCase("EXIT")) {
-				System.out.println();
-				System.out.println("Address Book closed.");
-				System.exit(0);
-			}
-			while(true) {
+			response = input.readLine().toLowerCase();
+			
+			while(true) {	// checks if response is acceptable 
+				if(response.equalsIgnoreCase("EXIT")) {
+					System.out.println("\nAddress Book closed.");
+					System.exit(0);
+				}
 				boolean acceptable = false;
 				for(int i = 0; i < operations.length; i++) {
 					if(operations[i].equals(response)) {
+						System.out.println();
 						acceptable = true;
 					}
 				}
@@ -46,33 +49,41 @@ public class AddressBook {
 					System.out.print("\nPlease enter a valid operation. You can select from 'add', 'delete', 'print', "
 							+ "'search', 'check', and 'size'. To exit, type 'EXIT'."
 							+ "\nWhat operation do you want to perform? ");
-					response = scanner.next().toLowerCase();
-				}
-				if(response.equalsIgnoreCase("EXIT")) {
-					System.out.println();
-					System.out.println("Address Book closed.");
-					System.exit(0);
+					response = input.readLine().toLowerCase();
+					
 				}
 			}
-			System.out.println();
-			if(response.equals("delete") || response.equals("print") || response.equals("search") ||
-					response.equals("check") && AB.isEmpty()) {
+			
+			if((response.equals("delete") || response.equals("print") || response.equals("search") ||
+					response.equals("check")) && AB.isEmpty()) {
 				System.out.println("Sorry, this operation cannot be performed as your Address Book is empty! "
 						+ "Please add a contact.\n");
 				continue;
 			}
+			
 			if(response.equalsIgnoreCase("add")) {
-				System.out.println("Enter the full name of the contact: ");
-				String name = scanner.nextLine();
-				
-				System.out.print("Enter the number of the contact: ");
-				long number = scanner.nextLong();
+				System.out.print("Enter the full name of the contact: ");
+				String name = input.readLine();
+				long number;
+				try {
+					System.out.print("Enter the number of the contact: ");
+					String inputNum = input.readLine();
+					BigInteger bigNum = new BigInteger(inputNum);
+					number = bigNum.longValue();
+				} catch (NumberFormatException e) {
+					System.out.println("Please enter a valid number next time.\n");
+					continue;
+				}
 				
 				System.out.print("Enter the email of the contact: ");
-				String email = scanner.next();
-				
+				String email = input.readLine();
+				if((!email.contains("@")) || (!email.contains("."))) {
+					System.out.println("Please enter a valid email next time.\n");
+					continue;
+				}
+					
 				System.out.print("Enter the address of the contact: ");
-				String address = scanner.nextLine();
+				String address = input.readLine();
 				
 				AB.addContact(name, number, email, address);
 				System.out.println();
@@ -85,14 +96,33 @@ public class AddressBook {
 				continue;
 			} else if (response.equalsIgnoreCase("print")) {
 				
+				// FORMATTING FOR PRINTING
+				
+				
+				System.out.println("There are currently " + AB.sizeOfAB + " contacts in your Address Book.\n");
+				AB.printContacts();
 				System.out.println();
 				continue;
 			} else if (response.equalsIgnoreCase("search")) {
-				
+				System.out.print("Enter a name you would like to search for in your Address Book: ");
+				String name = input.readLine();
+				System.out.println("Here are the following contacts that have the name you provided: ");
+				AB.search(AB.root, name);
 				System.out.println();
 				continue;
 			} else if (response.equalsIgnoreCase("check")) {
-				
+				System.out.println("Enter a contact name to see if it is already in your Address Book: ");
+				String name = input.readLine();
+				if(AB.contains(name)) {
+					if(AB.containsMultiple(name)) {
+						System.out.println("There are multiple people with this name that exist in your Address Book!");
+					} else {
+						System.out.println("This contact exists in your Address Book!");
+					}
+					System.out.println("To display their information, use the 'search' feature and input their name.");
+				} else {
+					System.out.println("This contact does not exist in your Address Book. Please 'add' the contact.");
+				}
 				System.out.println();
 				continue;
 			} else if (response.equalsIgnoreCase("size")) {
@@ -101,8 +131,8 @@ public class AddressBook {
 				continue;
 			}
 			
-		} while (!response.equalsIgnoreCase("EXIT"));
-		
+			
+		} // end of main while loop
 	}
 
 }
