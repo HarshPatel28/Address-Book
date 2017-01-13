@@ -20,7 +20,7 @@ public class ContactAVL {
 	}
 	
 	public void addContact(String name, long number, String email, String address)
-	throws IllegalArgumentException {	// throw argument if same name AND number!!!!!
+	throws IllegalArgumentException {	
 		Contact ptr = root, prev = null;
 		Contact newContact = new Contact(name, number, email, address);
 		if(ptr == null) {	// AddressBook is empty
@@ -34,7 +34,7 @@ public class ContactAVL {
 		while(ptr != null) {
 			equals = name.compareToIgnoreCase(ptr.name);
 			if(equals == 0) { 
-				if(number == ptr.number) {
+				if(number == ptr.number && email.equalsIgnoreCase(ptr.email) && address.equalsIgnoreCase(ptr.address)) {
 					throw new IllegalArgumentException("Contact already exists.");
 				} else {
 					Contact temp = ptr.right;
@@ -205,7 +205,7 @@ public class ContactAVL {
 		rotateLL(rootNode);
 	}
 	
-	public void deleteContact(String name)// what if duplicate name but different number?????
+	public void deleteContact(String name)
 	throws NoSuchElementException {
 		
 		if(!contains(name)) {
@@ -241,13 +241,13 @@ public class ContactAVL {
 			ptr.email = replacement.email;
 			ptr.address = replacement.address;
 			ptr = replacement;
-		}
+		} 
 		
 		if(ptr.left == null && ptr.right == null) {
 			if(ptr == root) {
 				root = null;
 				sizeOfAB--;
-				updateHeight();
+				updateHeight(); 
 				rebalance(root); 
 				updateParent();
 				return;
@@ -301,7 +301,7 @@ public class ContactAVL {
 			}
 			sizeOfAB--;
 			updateHeight(); 
-			rebalance(root);
+			rebalance(root); 
 			updateParent();
 			return;
 		}
@@ -402,7 +402,7 @@ public class ContactAVL {
 		if(root == null) {
 			return;
 		}
-	
+		
 		recursiveUpdateHeight(root);
 	}
 	
@@ -467,13 +467,16 @@ public class ContactAVL {
 		}
 		recursivePrintContacts(rootNode.left);
 		
-		System.out.println(rootNode.name + "\t" + rootNode.number + "\t" + 
-				rootNode.email + "\t" + rootNode.address);
+		System.out.printf("%-30s%-12d%-30s%s", rootNode.name, rootNode.number,
+				rootNode.email, rootNode.address);
+		System.out.println();
+		//System.out.println(rootNode.name + "\t" + rootNode.number + "\t" + 
+		//		rootNode.email + "\t" + rootNode.address);
 		
 		recursivePrintContacts(rootNode.right);
 	}
 	
-	public void updateParent() { 	
+	public void updateParent() { 
 		recursiveUpdateParent(root);
 	}
 	
@@ -506,7 +509,7 @@ public class ContactAVL {
 		search(rootNode.right, name);
 	}
 	
-	public boolean contains(String name) {	// what if user wants to search using number????
+	public boolean contains(String name) {
 		Contact checker = root;
 		int equals = 0;
 		while(checker != null) {
@@ -517,7 +520,7 @@ public class ContactAVL {
 			checker = equals > 0 ? checker.right : checker.left;
 		}
 		return false;
-	}
+	}	
 	
 	public boolean containsMultiple(String name) {
 		if(recursiveContainsMultiple(root, name) > 1) {

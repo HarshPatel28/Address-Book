@@ -2,9 +2,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
-
 public class AddressBook {
-
+	
 	/*
 	 * Main driver class that asks the user for what actions to perform, 
 	 * such as adding, deleting, searching, and printing all contacts.
@@ -16,6 +15,7 @@ public class AddressBook {
 		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 		ContactAVL AB = new ContactAVL();
 		
+		//System.out.printf("%-10s %-10s %-20s\n", "one", "two", "");
 		String[] operations = {"add", "delete", "print", "search", "check", "size"};
 		
 		System.out.println("Hello! This is your personal address book! You can 'add' a contact, 'delete' a contact,"
@@ -84,22 +84,25 @@ public class AddressBook {
 					
 				System.out.print("Enter the address of the contact: ");
 				String address = input.readLine();
-				
-				AB.addContact(name, number, email, address);
-				System.out.println();
-				System.out.println("Contact succesfully added!");
-				System.out.println();
+				try {
+					AB.addContact(name, number, email, address);
+					System.out.println("Contact succesfully added!");
+					System.out.println();
+				} catch (IllegalArgumentException e) {
+					System.out.println("This contact already exists in your Address Book!\n");
+				}
 				continue;
 			} else if (response.equalsIgnoreCase("delete")) {
 				
 				System.out.println();
 				continue;
 			} else if (response.equalsIgnoreCase("print")) {
-				
-				// FORMATTING FOR PRINTING
-				
-				
-				System.out.println("There are currently " + AB.sizeOfAB + " contacts in your Address Book.\n");
+				if(AB.sizeOfAB == 1) {
+					System.out.println("There is currently 1 contact in your Address Book.\n");
+				} else {
+					System.out.println("There are currently " + AB.sizeOfAB + " contacts in your Address Book.\n");
+				}
+				System.out.printf("%-30s%-12s%-30s%s\n\n", "Name", "Number", "Email", "Address");
 				AB.printContacts();
 				System.out.println();
 				continue;
@@ -126,11 +129,14 @@ public class AddressBook {
 				System.out.println();
 				continue;
 			} else if (response.equalsIgnoreCase("size")) {
-				System.out.println("There are currently " + AB.sizeOfAB + " contacts in the Address Book.");
+				if(AB.sizeOfAB == 1) {
+					System.out.println("There is currently 1 contact in the Address Book.");
+				} else {
+					System.out.println("There are currently " + AB.sizeOfAB + " contacts in the Address Book.");
+				}
 				System.out.println();
 				continue;
 			}
-			
 			
 		} // end of main while loop
 	}
