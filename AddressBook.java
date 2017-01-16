@@ -15,7 +15,6 @@ public class AddressBook {
 		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 		ContactAVL AB = new ContactAVL();
 		
-		//System.out.printf("%-10s %-10s %-20s\n", "one", "two", "");
 		String[] operations = {"add", "delete", "print", "search", "check", "size"};
 		
 		System.out.println("Hello! This is your personal address book! You can 'add' a contact, 'delete' a contact,"
@@ -93,7 +92,27 @@ public class AddressBook {
 				}
 				continue;
 			} else if (response.equalsIgnoreCase("delete")) {
-				
+				System.out.print("Enter the name of the contact you want to delete: ");
+				String name = input.readLine();
+				if(AB.containsMultiple(name)) {
+					try {
+						System.out.print("There are multiple contacts in the Address Book with that name. "
+								+ "Please enter the telephone number to be more specific:");
+						String inputNum = input.readLine();
+						BigInteger bigNum = new BigInteger(inputNum);
+						long number = bigNum.longValue();
+						AB.specialDeletionCase(AB.root, name, number);
+						System.out.println("'" + name + "' with the number '" + number + "' has been deleted from the Address Book.");
+					} catch (NumberFormatException e){
+						System.out.println("Please enter valid information next time.");
+						continue;
+					}
+				} else if (AB.contains(name)) {
+					AB.deleteContact(name);
+					System.out.println("'" + name + "' has been deleted from the Address Book.");
+				} else {
+					System.out.println("This contact does not exist in the Address Book.");
+				}
 				System.out.println();
 				continue;
 			} else if (response.equalsIgnoreCase("print")) {
@@ -114,7 +133,7 @@ public class AddressBook {
 				System.out.println();
 				continue;
 			} else if (response.equalsIgnoreCase("check")) {
-				System.out.println("Enter a contact name to see if it is already in your Address Book: ");
+				System.out.print("Enter a contact name to see if it is already in your Address Book: ");
 				String name = input.readLine();
 				if(AB.contains(name)) {
 					if(AB.containsMultiple(name)) {

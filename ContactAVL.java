@@ -205,17 +205,7 @@ public class ContactAVL {
 		rotateLL(rootNode);
 	}
 	
-	public void deleteContact(String name)
-	throws NoSuchElementException {
-		
-		if(!contains(name)) {
-			throw new NoSuchElementException("This contact does not exist.");
-		}
-		/*
-			if(containsMultiple(name)) {
-				// SEND TO A SPECIAL DELETION CASE.
-			}
-		*/
+	public void deleteContact(String name){
 		
 		Contact ptr = root, prev = null;
 		int equals = 0;
@@ -503,8 +493,10 @@ public class ContactAVL {
 		
 		search(rootNode.left, name);
 		if(rootNode.name.toLowerCase().contains(name)) {
-			System.out.println(rootNode.name + "\t" + rootNode.number + "\t" + 
-					rootNode.email + "\t" + rootNode.address);
+			System.out.printf("%-30s%-12d%-30s%s\n", rootNode.name, rootNode.number,
+					rootNode.email, rootNode.address);
+			//System.out.println(rootNode.name + "\t" + rootNode.number + "\t" + 
+			//		rootNode.email + "\t" + rootNode.address);
 		}
 		search(rootNode.right, name);
 	}
